@@ -1,4 +1,4 @@
-package com.trunov.departmentsJDBC.entity;
+package com.trunov.departments_jdbc.entity;
 
 /**
  * Created by misha on 21.02.17.

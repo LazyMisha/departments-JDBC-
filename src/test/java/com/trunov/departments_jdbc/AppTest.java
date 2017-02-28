@@ -1,4 +1,4 @@
-package com.trunov.departmentsJDBC;
+package com.trunov.departments_jdbc;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

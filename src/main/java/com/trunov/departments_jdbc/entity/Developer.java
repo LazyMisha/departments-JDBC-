@@ -1,6 +1,6 @@
-package com.trunov.departmentsJDBC.entity;
+package com.trunov.departments_jdbc.entity;
 
-import static com.trunov.departmentsJDBC.dao.ActionsDao.idEmp;
+import static com.trunov.departments_jdbc.dao.ActionsDao.idEmp;
 
 /**
  * Created by misha on 21.02.17.

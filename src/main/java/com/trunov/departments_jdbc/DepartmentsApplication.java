@@ -1,14 +1,19 @@
-package com.trunov.departmentsJDBC;
+package com.trunov.departments_jdbc;
 
-import com.trunov.departmentsJDBC.database.Database;
-import com.trunov.departmentsJDBC.entity.Departments;
-import com.trunov.departmentsJDBC.entity.Developer;
-import com.trunov.departmentsJDBC.entity.Manager;
+import com.trunov.departments_jdbc.dao.ActionsDao;
+import com.trunov.departments_jdbc.dao.DepartmentsDao;
+import com.trunov.departments_jdbc.dao.DevelopersDao;
+import com.trunov.departments_jdbc.dao.ManagersDao;
+import com.trunov.departments_jdbc.util.Database;
+import com.trunov.departments_jdbc.entity.Departments;
+import com.trunov.departments_jdbc.entity.Developer;
+import com.trunov.departments_jdbc.entity.Manager;
+import com.trunov.departments_jdbc.util.PrintList;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import static com.trunov.departmentsJDBC.dao.ActionsDao.*;
+import static com.trunov.departments_jdbc.dao.ActionsDao.*;
 
 /**
  * Created by misha on 21.02.17.
@@ -31,19 +36,21 @@ public class DepartmentsApplication {
                 break;
             }else{
                 arr = str.split(" ");
-                for (int i = 0; i < arr.length; i++) {
-                    list.add(arr[i]);
+                for(String anArr : arr) {
+                    list.add(anArr);
                 }
                 switch (list.get(0)) {
                     // list of commands
                     case "help":
                         list.clear();
-                        printCommandsList();
+                        for(int i = 0; i <= 13; i++) {
+                            System.out.println(PrintList.printCommandsList().get(i));
+                        }
                         break;
                     // list of departments
                     case "departments":
                         list.clear();
-                        openDepartments();
+                        DepartmentsDao.open();
                         break;
                     // open commands
                     case "open":
@@ -54,11 +61,11 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else if (list.contains("-e")) {
-                            openAllEmployeesById(Integer.parseInt(list.get(2)));
+                            ActionsDao.openEmployeesById(Integer.parseInt(list.get(2)));
                             list.clear();
                             break;
                         } else if (list.contains("-d")) {
-                            openAllEmployeesByDepartmentName(list.get(2));
+                            ActionsDao.openEmployeesByDepartmentName(list.get(2));
                             list.clear();
                             break;
                         }
@@ -67,7 +74,7 @@ public class DepartmentsApplication {
                         // create departments
                         if (list.contains("-d")) {
                             new Departments(list.get(2));
-                            createDepartments(list.get(2));
+                            DepartmentsDao.create(list.get(2));
                             list.clear();
                             break;
                         }
@@ -87,7 +94,7 @@ public class DepartmentsApplication {
                                     new Developer(list.get(3), list.get(5),
                                             Integer.parseInt(list.get(9)),
                                             list.get(7), list.get(13), list.get(11));
-                                    createDeveloper(list.get(3), list.get(5),
+                                    DevelopersDao.create(list.get(3), list.get(5),
                                             Integer.parseInt(list.get(9)),
                                             list.get(7).charAt(0), list.get(13), list.get(11));
                                     list.clear();
@@ -103,7 +110,7 @@ public class DepartmentsApplication {
                                         new Manager(list.get(3), list.get(5),
                                                 Integer.parseInt(list.get(9)),
                                                 list.get(7), list.get(13), list.get(11));
-                                        createManager(list.get(3), list.get(5),
+                                        ManagersDao.create(list.get(3), list.get(5),
                                                 Integer.parseInt(list.get(9)),
                                                 list.get(7).charAt(0), list.get(13), list.get(11));
                                         list.clear();
@@ -122,17 +129,17 @@ public class DepartmentsApplication {
                             break;
                         // remove department
                         } else if (list.contains("-d")){
-                            removeDepartmentByName(list.get(2));
+                            DepartmentsDao.removeByName(list.get(2));
                             list.clear();
                             break;
                         // remove developer
                         }else if (list.contains("-dv")) {
-                            removeDevelopersById(Integer.parseInt(list.get(2)));
+                            DevelopersDao.removeById(Integer.parseInt(list.get(2)));
                             list.clear();
                             break;
                         // remove manager
                         }else if (list.contains("-mn")){
-                            removeManagerById(Integer.parseInt(list.get(2)));
+                            ManagersDao.removeById(Integer.parseInt(list.get(2)));
                             list.clear();
                             break;
                         }
@@ -152,7 +159,7 @@ public class DepartmentsApplication {
                                 list.clear();
                                 break;
                             } else {
-                                updateDeveloperById(Integer.parseInt(list.get(2)), list.get(4), list.get(6), Integer.parseInt(list.get(10)),
+                                DevelopersDao.updateById(Integer.parseInt(list.get(2)), list.get(4), list.get(6), Integer.parseInt(list.get(10)),
                                         list.get(8).charAt(0), list.get(14), list.get(12));
                                 list.clear();
                                 break;
@@ -164,7 +171,7 @@ public class DepartmentsApplication {
                                 list.clear();
                                 break;
                             } else {
-                                updateManagerById(Integer.parseInt(list.get(2)), list.get(4), list.get(6), Integer.parseInt(list.get(10)),
+                                ManagersDao.updateById(Integer.parseInt(list.get(2)), list.get(4), list.get(6), Integer.parseInt(list.get(10)),
                                         list.get(8).charAt(0), list.get(14), list.get(12));
                                 list.clear();
                                 break;
@@ -178,7 +185,7 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         }else{
-                            printAll();
+                            ActionsDao.openAll();
                             list.clear();
                             break;
                         }
@@ -203,12 +210,12 @@ public class DepartmentsApplication {
                             break;
                         }// top department of managers
                         else if(list.contains("m")){
-                            countOfManager();
+                            ManagersDao.count();
                             list.clear();
                             break;
                         }// top department of developers
                         else if(list.contains("d")){
-                            countOfDeveloper();
+                            DevelopersDao.count();
                             list.clear();
                             break;
                         }
