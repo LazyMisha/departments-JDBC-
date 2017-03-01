@@ -1,34 +1,34 @@
 package com.trunov.departments_jdbc.dao;
 
-import com.trunov.departments_jdbc.util.Database;
+import com.trunov.departments_jdbc.util.DatabaseUtil;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by misha on 21.02.17.
  */
-public abstract class ActionsDao {
-    public static int idEmp;
-    public static String str;
-    public static String Url = "jdbc:mysql://localhost/departments?autoReconnect=true&useSSL=false";
-    public static String Driver = "com.mysql.jdbc.Driver";
-    public static String User = "root";
-    public static String Password = "mysql";
-    public static String arr[];
-    public static ArrayList<String> list = new ArrayList<>();
+public class EmployeeDao {
+    private DevelopersDao developersDao = new DevelopersDao();
+    private ManagersDao managersDao = new ManagersDao();
 
-    public static void openEmployeesById(int id) throws SQLException{
-        DevelopersDao.openById(id);
-        ManagersDao.openById(id);
+    public EmployeeDao() {
+        DatabaseUtil.createDatabase();
     }
 
-    public static void openEmployeesByDepartmentName(String departmentName) throws SQLException{
-        DevelopersDao.openByDepartmentName(departmentName);
-        ManagersDao.openByDepartmentName(departmentName);
+    public void openEmployeesById(int id) throws SQLException{
+        developersDao.openById(id);
+        managersDao.openById(id);
     }
 
-    public static void openAll() throws SQLException{
+    public void openEmployeesByDepartmentName(String departmentName) throws SQLException{
+        developersDao.openByDepartmentName(departmentName);
+        managersDao.openByDepartmentName(departmentName);
+    }
+
+    public void openAll() throws SQLException{
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
@@ -36,7 +36,7 @@ public abstract class ActionsDao {
                 "union all " +
                 "select department, name, type, age from developers";
         try {
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(printAll);
             while(resultSet.next()){
@@ -60,7 +60,7 @@ public abstract class ActionsDao {
         }
     }
 
-    public static void searchEmployee(int age, String department) throws SQLException{
+    public void searchEmployee(int age, String department) throws SQLException{
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
@@ -68,7 +68,7 @@ public abstract class ActionsDao {
                 " union all " +
                 "select * from developers where age = " + age + " and department = '" + department + "'";
         try {
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(searchEmployee);
             while (resultSet.next()){

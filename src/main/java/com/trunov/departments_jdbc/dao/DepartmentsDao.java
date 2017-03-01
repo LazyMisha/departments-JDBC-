@@ -1,89 +1,76 @@
 package com.trunov.departments_jdbc.dao;
 
-import com.trunov.departments_jdbc.util.Database;
+import com.trunov.departments_jdbc.entity.Department;
+import com.trunov.departments_jdbc.util.DatabaseUtil;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by misha on 28.02.17.
  */
-public abstract class DepartmentsDao {
+public class DepartmentsDao {
+    private static final String SELECT_ALL_QUERY = "select * from departments";
+    private static final String INSERT_QUERY = "insert into departments (id, departments) values (?,?)";
+    private static final String DELETE_BY_NAME_QUERY = "delete from departments where departments = ?";
 
-    public static void open() throws SQLException {
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet departments = null;
-        String sqlDepartments = "SELECT * FROM departments";
-        try{
-            connection = Database.connectionToDb();
-            statement = connection.createStatement();
-            departments = statement.executeQuery(sqlDepartments);
-            while(departments.next()){
-                System.out.println("id: " + departments.getInt(1) +
-                        ", Name: " + departments.getString(2) + ".");
-            }
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        }finally {
-            if(statement != null){
-                statement.close();
-            }
-            if(connection != null) {
-                connection.close();
-            }
-            if(departments != null) {
-                departments.close();
-            }
-        }
+    private Connection connection = null;
+
+    public DepartmentsDao() {
+        DatabaseUtil.createTableDepartments();
+        connection = DatabaseUtil.getConnection();
     }
 
-    public static void create(String departmentName) throws SQLException{
-        Connection connection = null;
+    public List<Department> getAll() throws SQLException {
         Statement statement = null;
-        PreparedStatement ps = null;
-        String createDep = "insert into departments (departments)\n" +
-                "values ('" + departmentName + "')";
-        try{
-            connection = Database.connectionToDb();
+        List<Department> departments = new ArrayList<>();
+        try {
             statement = connection.createStatement();
-            ps = connection.prepareStatement(createDep);
-            ps.executeUpdate();
-            System.out.println("department is successfully created!");
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        }finally {
-            if(connection != null){
-                connection.close();
+            ResultSet rs = statement.executeQuery(SELECT_ALL_QUERY);
+            while (rs.next()) {
+                Department department = new Department(rs.getString(2));
+                department.setId(rs.getInt(1));
             }
-            if(statement != null){
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (statement != null) {
                 statement.close();
             }
-            if(ps != null){
+        }
+        return departments;
+    }
+
+    public void save(Department department) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            ps = connection.prepareStatement(INSERT_QUERY);
+            ps.setInt(1, department.getId());
+            ps.setString(2, department.getName());
+            ps.executeUpdate();
+
+            System.out.println("department is successfully created!");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (ps != null) {
                 ps.close();
             }
         }
     }
 
-    public static void removeByName(String departmentName) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
+    public void removeByName(String departmentName) throws SQLException {
         PreparedStatement ps = null;
-        String deleteDep = "delete from departments where departments = '" + departmentName + "'";
         try {
-            connection = Database.connectionToDb();
-            statement = connection.createStatement();
-            ps = connection.prepareStatement(deleteDep);
+            ps = connection.prepareStatement(DELETE_BY_NAME_QUERY);
+            ps.setString(1, departmentName);
             ps.executeUpdate();
             System.out.println("department " + departmentName + " is removed!");
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }finally {
-            if (connection != null) {
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(ps != null){
+        } finally {
+            if (ps != null) {
                 ps.close();
             }
         }

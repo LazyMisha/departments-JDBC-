@@ -5,9 +5,7 @@ package com.trunov.departments_jdbc;
  * created 21.02.2017
  */
 public class App {
-
     public static void main( String[] args ) {
-
         DepartmentsApplication departmentsApplication = new DepartmentsApplication();
         try {
             departmentsApplication.run();

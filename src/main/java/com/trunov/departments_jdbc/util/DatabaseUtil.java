@@ -2,50 +2,56 @@ package com.trunov.departments_jdbc.util;
 
 import java.sql.*;
 
-import static com.trunov.departments_jdbc.dao.ActionsDao.*;
-
 /**
  * Created by misha on 21.02.17.
  */
-public abstract class Database {
+public abstract class DatabaseUtil {
+    private static final String URL = "jdbc:mysql://localhost/departments?autoReconnect=true&useSSL=false";
+    private static final String DRIVER = "com.mysql.jdbc.Driver";
+    private static final String USER = "root";
+    private static final String PASSWORD = "mysql";
 
-    public static Connection connectionToDb(){
-        Connection connection = null;
-        try{
-            Class.forName(Driver);
-        }catch (ClassNotFoundException e){
-            System.out.println(e.getMessage());
-        }
-        try {
-            connection = DriverManager.getConnection(Url, User, Password);
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
+    private static final String CREATE_DATABASE_QUERY = "CREATE DATABASE departments";
+
+    private static Connection connection = null;
+
+    public static Connection getConnection(){
+        if(connection == null) {
+            try {
+                Class.forName(DRIVER);
+            } catch (ClassNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            try {
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
         }
         return connection;
     }
 
-    public static void createDatabase() throws SQLException{
-        Connection connection = null;
-        PreparedStatement ps = null;
-        String query = "CREATE DATABASE departments";
+    public static void createDatabase(){
+        Statement statement = null;
         try {
-            connection = connectionToDb();
-            ps = connection.prepareStatement(query);
-            ps.executeUpdate();
+            connection = getConnection();
+            statement = connection.createStatement();
+            statement.execute(CREATE_DATABASE_QUERY);
             System.out.println("created util for developers");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(ps != null){
-                ps.close();
+            if(statement != null){
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public static void createTableDepartments() throws SQLException{
+    public static void createTableDepartments(){
         Connection connection = null;
         Statement statement = null;
         PreparedStatement ps = null;
@@ -54,7 +60,7 @@ public abstract class Database {
                 "departments VARCHAR (30)\n" +
                 ");";
         try{
-            connection = connectionToDb();
+            connection = getConnection();
             statement = connection.createStatement();
             ps = connection.prepareStatement(createDep);
             ps.executeUpdate();
@@ -63,18 +69,30 @@ public abstract class Database {
             System.out.println(e.getMessage());
         }finally {
             if(ps != null){
-                ps.close();
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(connection != null){
-                connection.close();
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(statement != null){
-                statement.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public static void createTableDevelopers() throws SQLException{
+    public static void createTableDevelopers(){
         Connection connection = null;
         Statement statement = null;
         PreparedStatement ps = null;
@@ -88,7 +106,7 @@ public abstract class Database {
                 "department VARCHAR(20) NOT NULL" +
                 ");";
         try {
-            connection = connectionToDb();
+            connection = getConnection();
             statement = connection.createStatement();
             ps = connection.prepareStatement(createDev);
             ps.executeUpdate();
@@ -97,18 +115,30 @@ public abstract class Database {
             System.out.println(e.getMessage());
         }finally {
             if(connection != null){
-                connection.close();
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(statement != null){
-                statement.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(ps != null){
-                ps.close();
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public static void createTableManager() throws SQLException{
+    public static void createTableManager(){
         Connection connection = null;
         Statement statement = null;
         PreparedStatement ps = null;
@@ -122,7 +152,7 @@ public abstract class Database {
                 "department VARCHAR(20) NOT NULL" +
                 ");";
         try{
-            connection = connectionToDb();
+            connection = getConnection();
             statement = connection.createStatement();
             ps = connection.prepareStatement(createMan);
             ps.executeUpdate();
@@ -131,13 +161,25 @@ public abstract class Database {
             System.out.println(e.getMessage());
         }finally {
             if(connection != null){
-                connection.close();
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(statement != null){
-                statement.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if(ps != null){
-                ps.close();
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

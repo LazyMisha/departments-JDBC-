@@ -4,16 +4,19 @@ package com.trunov.departments_jdbc.entity;
  * Created by misha on 21.02.17.
  */
 public class Employee extends Entity {
-    private String lastname;
+    protected static int UNIQUE_EMPLOYEE_ID = 0;
+
     private int age;
+    private String lastname;
     private String type;
     private String department;
 
-    Employee(String name, String lastname, int age, String type, String department) {
+    Employee(String name, String lastName, int age, String type, String department) {
         super(name);
-        this.lastname = lastname;
+        this.lastname = lastName;
         this.age = age;
         this.type = type;
         this.department = department;
+        this.id = UNIQUE_EMPLOYEE_ID++;
     }
 }
