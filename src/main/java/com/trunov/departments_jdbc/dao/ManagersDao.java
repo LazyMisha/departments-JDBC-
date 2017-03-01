@@ -1,20 +1,24 @@
 package com.trunov.departments_jdbc.dao;
 
-import com.trunov.departments_jdbc.util.Database;
+import com.trunov.departments_jdbc.util.DatabaseUtil;
 import java.sql.*;
 
 /**
  * Created by misha on 28.02.17.
  */
-public abstract class ManagersDao {
+public class ManagersDao {
 
-    public static void openById(int id) throws SQLException{
+    public ManagersDao() {
+        DatabaseUtil.createTableManager();
+    }
+
+    public void  openById(int id) throws SQLException{
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         String openDeveloper = "select * from managers where id = " + id;
         try{
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(openDeveloper);
             while (resultSet.next()){
@@ -41,13 +45,13 @@ public abstract class ManagersDao {
         }
     }
 
-    public static void openByDepartmentName(String departmentName) throws SQLException{
+    public void  openByDepartmentName(String departmentName) throws SQLException{
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         String openDeveloper = "select * from managers where department = '" + departmentName + "'";
         try{
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(openDeveloper);
             while (resultSet.next()){
@@ -74,7 +78,7 @@ public abstract class ManagersDao {
         }
     }
 
-    public static void create(String name, String lastname, int age, char type,
+    public void create(String name, String lastname, int age, char type,
                                      String methodology, String departments) throws SQLException{
         Connection connection = null;
         Statement statement = null;
@@ -85,7 +89,7 @@ public abstract class ManagersDao {
                 "('" + name + "'," + "'" + lastname + "'," + age + "," + "'" + type + "'," +
                 "'" + methodology + "'," + "'" + departments + "'" + ")";
         try{
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             preparedStatement = connection.prepareStatement(createMan);
             preparedStatement.executeUpdate();
@@ -105,13 +109,13 @@ public abstract class ManagersDao {
         }
     }
 
-    public static void removeById(int managerId) throws SQLException{
+    public void  removeById(int managerId) throws SQLException{
         Connection connection = null;
         Statement statement = null;
         PreparedStatement preparedStatement = null;
         String deleteMan = "delete from managers where id = " + managerId;
         try {
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             preparedStatement = connection.prepareStatement(deleteMan);
             preparedStatement.executeUpdate();
@@ -131,7 +135,7 @@ public abstract class ManagersDao {
         }
     }
 
-    public static void updateById(int id, String name, String lastname, int age, char type,
+    public void  updateById(int id, String name, String lastname, int age, char type,
                                          String methodology, String departments) throws SQLException{
         Connection connection = null;
         Statement statement = null;
@@ -140,7 +144,7 @@ public abstract class ManagersDao {
                 age + ", type = '" + type + "', methodology = '" + methodology + "', department = '" + departments + "'" +
                 " where id = " + id;
         try {
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             preparedStatement = connection.prepareStatement(updateMan);
             preparedStatement.executeUpdate();
@@ -160,13 +164,13 @@ public abstract class ManagersDao {
         }
     }
 
-    public static void count() throws SQLException{
+    public void  count() throws SQLException{
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         String searchMan = "select department, count(*) from managers group by department";
         try{
-            connection = Database.connectionToDb();
+            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(searchMan);
             resultSet.next();
