@@ -1,5 +1,6 @@
 package com.trunov.departments_jdbc;
 
+import com.sun.org.apache.xerces.internal.dom.DeepNodeListImpl;
 import com.trunov.departments_jdbc.dao.DepartmentsDao;
 import com.trunov.departments_jdbc.dao.DevelopersDao;
 import com.trunov.departments_jdbc.dao.EmployeeDao;
@@ -7,9 +8,11 @@ import com.trunov.departments_jdbc.dao.ManagersDao;
 import com.trunov.departments_jdbc.entity.Department;
 import com.trunov.departments_jdbc.entity.Developer;
 import com.trunov.departments_jdbc.entity.Manager;
+import com.trunov.departments_jdbc.util.DatabaseUtil;
 import com.trunov.departments_jdbc.util.PrintList;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -27,13 +30,18 @@ public class DepartmentsApplication {
     private ManagersDao managersDao = new ManagersDao();
     private DevelopersDao developersDao = new DevelopersDao();
 
-    public void run() throws Exception {
+    public void run(){
         System.out.println("please type help for view list of all COMMANDS!");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
-            str = reader.readLine();
+            try {
+                str = reader.readLine();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
             if (str.equals("exit")) {
+                DatabaseUtil.closeConnection();
                 break;
             } else {
                 arr = str.split(" ");
@@ -51,14 +59,10 @@ public class DepartmentsApplication {
                     // list of departments
                     case "departments":
                         list.clear();
-                        for (Department department : departmentsDao.getAll()) {
-                            System.out.println("id: " + department.getId() +
-                                    ", Name: " + department.getName() + ".");
-                        }
-
+                        departmentsDao.getAll();
                         break;
                     // getAll COMMANDS
-                    case "getAll":
+                   case "getAll":
                         if (list.size() != 3) {
                             System.out.println("not correct command, please type help for vew all COMMANDS!");
                             System.out.println("type \"getAll -e employee_id\" to watch employee details");
@@ -66,11 +70,11 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else if (list.contains("-e")) {
-                            employeeDao.openEmployeesById(Integer.parseInt(list.get(2)));
+                            employeeDao.getAllEmployeesById(Integer.parseInt(list.get(2)));
                             list.clear();
                             break;
                         } else if (list.contains("-d")) {
-                            employeeDao.openEmployeesByDepartmentName(list.get(2));
+                            employeeDao.getEmployeesByDepartmentName(list.get(2));
                             list.clear();
                             break;
                         }
@@ -84,7 +88,8 @@ public class DepartmentsApplication {
                             break;
                         } else if (list.size() != 14) {
                             System.out.println("not correct command, please type help for vew all COMMANDS!");
-                            System.out.println("type \"save -e -n employee_name -t type(m for manager or d for developer) -a age -dp department -l language(developers only) -m methodology(managers only)\" to save new employee");
+                            System.out.println("type \"save -e -n employee_name -t type(m for manager or d for developer) " +
+                                    "-a age -dp department -l language(developers only) -m methodology(managers only)\" to save new employee");
                             list.clear();
                             break;
                         } else if (list.contains("-e")) {
@@ -95,12 +100,10 @@ public class DepartmentsApplication {
                                     list.clear();
                                     break;
                                 } else {
-                                    new Developer(list.get(3), list.get(5),
+                                    Developer developer = new Developer(list.get(3), list.get(5),
                                             Integer.parseInt(list.get(9)),
                                             list.get(7), list.get(13), list.get(11));
-                                    developersDao.create(list.get(3), list.get(5),
-                                            Integer.parseInt(list.get(9)),
-                                            list.get(7).charAt(0), list.get(13), list.get(11));
+                                    developersDao.save(developer);
                                     list.clear();
                                     break;
                                 }
@@ -111,12 +114,10 @@ public class DepartmentsApplication {
                                     list.clear();
                                     break;
                                 } else {
-                                    new Manager(list.get(3), list.get(5),
+                                    Manager manager = new Manager(list.get(3), list.get(5),
                                             Integer.parseInt(list.get(9)),
                                             list.get(7), list.get(13), list.get(11));
-                                    managersDao.create(list.get(3), list.get(5),
-                                            Integer.parseInt(list.get(9)),
-                                            list.get(7).charAt(0), list.get(13), list.get(11));
+                                    managersDao.save(manager);
                                     list.clear();
                                     break;
                                 }
@@ -189,7 +190,7 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else {
-                            employeeDao.openAll();
+                            employeeDao.getAll();
                             list.clear();
                             break;
                         }

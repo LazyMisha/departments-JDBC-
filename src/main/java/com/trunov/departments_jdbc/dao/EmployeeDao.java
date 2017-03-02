@@ -1,93 +1,93 @@
 package com.trunov.departments_jdbc.dao;
 
+import com.trunov.departments_jdbc.entity.Developer;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.xml.bind.ValidationEvent;
+import java.sql.*;
 
 /**
  * Created by misha on 21.02.17.
  */
 public class EmployeeDao {
-    private DevelopersDao developersDao = new DevelopersDao();
-    private ManagersDao managersDao = new ManagersDao();
+
+    private static final String SELECT_ALL_QUERY = "select department, name, type, age from managers " +
+            "union all " +
+            "select department, name, type, age from developers";
+    private static final String SEARCH_ALL_EMPLOYEE_QUERY = "select * from managers where age = ? and department = ?" +
+            " union all " +
+            "select * from developers where age = ? and department = ?";
+
+    Connection connection = null;
+
+    ManagersDao managersDao = new ManagersDao();
+    DevelopersDao developersDao = new DevelopersDao();
 
     public EmployeeDao() {
         DatabaseUtil.createDatabase();
+        connection = DatabaseUtil.getConnection();
     }
 
-    public void openEmployeesById(int id) throws SQLException{
-        developersDao.openById(id);
-        managersDao.openById(id);
+    public void getAllEmployeesById(int id){
+        developersDao.getById(id);
+        managersDao.getById(id);
     }
 
-    public void openEmployeesByDepartmentName(String departmentName) throws SQLException{
-        developersDao.openByDepartmentName(departmentName);
-        managersDao.openByDepartmentName(departmentName);
+    public void getEmployeesByDepartmentName(String departmentName){
+        developersDao.getByDepartmentName(departmentName);
+        managersDao.getByDepartmentName(departmentName);
     }
 
-    public void openAll() throws SQLException{
-        Connection connection = null;
+    public void getAll(){
         Statement statement = null;
-        ResultSet resultSet = null;
-        String printAll = "select department, name, type, age from managers " +
-                "union all " +
-                "select department, name, type, age from developers";
         try {
-            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery(printAll);
-            while(resultSet.next()){
-                System.out.println("Department Name: " + resultSet.getString(1) +
-                        ", Employee Name: " + resultSet.getString(2) +
-                ", Employee Type: " + resultSet.getString(3) +
-                ", Employee Age: " + resultSet.getInt(4));
+            ResultSet rs = statement.executeQuery(SELECT_ALL_QUERY);
+            while(rs.next()){
+                System.out.println("Department Name: " + rs.getString(1) + "\n" +
+                        "Employee Name: " + rs.getString(2) + "\n" +
+                "Employee Type: " + rs.getString(3) + "\n" +
+                "Employee Age: " + rs.getInt(4));
+                System.out.println("<---------------------->");
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
             if(statement != null){
-                statement.close();
-            }
-            if(resultSet != null){
-                resultSet.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void searchEmployee(int age, String department) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        String searchEmployee = "select * from managers where age = " + age + " and department = '" + department + "'" +
-                " union all " +
-                "select * from developers where age = " + age + " and department = '" + department + "'";
+    public void searchEmployee(int age, String department){
+        PreparedStatement ps = null;
         try {
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(searchEmployee);
+            ps = connection.prepareStatement(SEARCH_ALL_EMPLOYEE_QUERY);
+            ps.setInt(1, age);
+            ps.setString(2, department);
+            ps.setInt(3, age);
+            ps.setString(4, department);
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
-                System.out.println("id: " + resultSet.getInt(1) +
-                        ", Name: " + resultSet.getString(2) +
-                        ", Type: " + resultSet.getString(5) +
-                        ", Department: " + resultSet.getString(7));
+                System.out.println("Id: " + resultSet.getInt(1) + "\n" +
+                        "Name: " + resultSet.getString(2) + "\n" +
+                        "Type: " + resultSet.getString(5) + "\n" +
+                        "Department: " + resultSet.getString(7));
+                System.out.println("<---------------------->");
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(resultSet != null){
-                resultSet.close();
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.trunov.departments_jdbc.dao;
 
+import com.trunov.departments_jdbc.entity.Manager;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
 import java.sql.*;
 
@@ -7,185 +8,165 @@ import java.sql.*;
  * Created by misha on 28.02.17.
  */
 public class ManagersDao {
+    private static final String SELECT_BY_ID_QUERY = "select * from managers where id = ?";
+    private static final String SELECT_BY_DEPARTMENT_NAME_QUERY = "select * from managers where department = ?";
+    private static final String INSERT_INTO_MANAGERS_QUERY = "insert into managers\n" +
+            "(name, lastname, age, type, methodology, department)\n" +
+            "values\n" +
+            "(?, ?, ?, ?, ?, ?)";
+    private static final String DELETE_FROM_MANAGERS_QUERY = "delete from managers where id = ?";
+    private static final String UPDATE_MANAGERS_QUERY = "update managers set name = ?, " +
+            "lastname = ?, age = ?,type = ?, methodology = ?, department = ? where id = ?";
+    private static final String SELECT_MANAGERS_COUNT_QUERY = "select department, count(*) from managers group by department";
+
+    Connection connection = null;
 
     public ManagersDao() {
         DatabaseUtil.createTableManager();
+        connection = DatabaseUtil.getConnection();
     }
 
-    public void  openById(int id) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        String openDeveloper = "select * from managers where id = " + id;
+    public void  getById(int id){
+        PreparedStatement ps = null;
         try{
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(openDeveloper);
-            while (resultSet.next()){
-                System.out.println("id: " + resultSet.getInt(1) +
-                        ", Name: " + resultSet.getString(2) +
-                        ", Last Name: " + resultSet.getString(3) +
-                        ", Age: " + resultSet.getInt(4) +
-                        ", Type: " + resultSet.getString(5) +
-                        ", Methodology: " + resultSet.getString(6) +
-                        ", Department: " + resultSet.getString(7));
+            ps = connection.prepareStatement(SELECT_BY_ID_QUERY);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                System.out.println("Id: " + rs.getInt(1) + "\n" +
+                        "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
+                        "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
+                        "Methodology: " + rs.getString(6) + "\n" + "Department: " + rs.getString(7));
+                System.out.println("<---------------------->");
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(resultSet != null){
-                resultSet.close();
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void  openByDepartmentName(String departmentName) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        String openDeveloper = "select * from managers where department = '" + departmentName + "'";
+    public void  getByDepartmentName(String departmentName){
+        PreparedStatement ps = null;
         try{
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(openDeveloper);
-            while (resultSet.next()){
-                System.out.println("id: " + resultSet.getInt(1) +
-                        ", Name: " + resultSet.getString(2) +
-                        ", Last Name: " + resultSet.getString(3) +
-                        ", Age: " + resultSet.getInt(4) +
-                        ", Type: " + resultSet.getString(5) +
-                        ", Methodology: " + resultSet.getString(6) +
-                        ", Department: " + resultSet.getString(7));
+            ps = connection.prepareStatement(SELECT_BY_DEPARTMENT_NAME_QUERY);
+            ps.setString(1, departmentName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                System.out.println("Id: " + rs.getInt(1) + "\n" +
+                        "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
+                        "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
+                        "Methodology: " + rs.getString(6) + "\n" + "Department: " + rs.getString(7));
+                System.out.println("<---------------------->");
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(resultSet != null){
-                resultSet.close();
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void create(String name, String lastname, int age, char type,
-                                     String methodology, String departments) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        PreparedStatement preparedStatement = null;
-        String createMan = "insert into managers\n" +
-                "(name, lastname, age, type, methodology, department)\n" +
-                "values\n" +
-                "('" + name + "'," + "'" + lastname + "'," + age + "," + "'" + type + "'," +
-                "'" + methodology + "'," + "'" + departments + "'" + ")";
+    public void save(Manager manager){
+        PreparedStatement ps = null;
         try{
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            preparedStatement = connection.prepareStatement(createMan);
-            preparedStatement.executeUpdate();
-            System.out.println("manager is successfully created!");
+            ps = connection.prepareStatement(INSERT_INTO_MANAGERS_QUERY);
+            ps.setString(1, manager.getName());
+            ps.setString(2, manager.getLastname());
+            ps.setInt(3, manager.getAge());
+            ps.setString(4, manager.getType());
+            ps.setString(5, manager.getMethodology());
+            ps.setString(6,manager.getDepartment());
+            ps.executeUpdate();
+            System.out.println("manager " + manager.getName() + " is successfully created!");
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(preparedStatement != null){
-                preparedStatement.close();
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void  removeById(int managerId) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        PreparedStatement preparedStatement = null;
-        String deleteMan = "delete from managers where id = " + managerId;
+    public void  removeById(int managerId){
+        PreparedStatement ps = null;
         try {
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            preparedStatement = connection.prepareStatement(deleteMan);
-            preparedStatement.executeUpdate();
+            ps = connection.prepareStatement(DELETE_FROM_MANAGERS_QUERY);
+            ps.setInt(1, managerId);
+            ps.executeUpdate();
             System.out.println("manager with id " + managerId + " is removed!");
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(preparedStatement != null){
-                preparedStatement.close();
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
     public void  updateById(int id, String name, String lastname, int age, char type,
-                                         String methodology, String departments) throws SQLException{
-        Connection connection = null;
-        Statement statement = null;
-        PreparedStatement preparedStatement = null;
-        String updateMan = "update managers set name = '" + name + "', lastname = '" + lastname + "', age = " +
-                age + ", type = '" + type + "', methodology = '" + methodology + "', department = '" + departments + "'" +
-                " where id = " + id;
+                                         String methodology, String departments){
+        PreparedStatement ps = null;
         try {
-            connection = DatabaseUtil.getConnection();
-            statement = connection.createStatement();
-            preparedStatement = connection.prepareStatement(updateMan);
-            preparedStatement.executeUpdate();
+            ps = connection.prepareStatement(UPDATE_MANAGERS_QUERY);
+            ps.setString(1, name);
+            ps.setString(2, lastname);
+            ps.setInt(3, age);
+            ps.setString(4, String.valueOf(type));
+            ps.setString(5, methodology);
+            ps.setString(6, departments);
+            ps.setInt(7, id);
+            ps.executeUpdate();
             System.out.println("manager with id " + id + " is updated!");
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
-            if(statement != null){
-                statement.close();
-            }
-            if(preparedStatement != null){
-                preparedStatement.close();
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void  count() throws SQLException{
-        Connection connection = null;
+    public void  count(){
         Statement statement = null;
-        ResultSet resultSet = null;
-        String searchMan = "select department, count(*) from managers group by department";
         try{
-            connection = DatabaseUtil.getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery(searchMan);
-            resultSet.next();
-            System.out.println("Department: " + resultSet.getString(1));
+            ResultSet rs = statement.executeQuery(SELECT_MANAGERS_COUNT_QUERY);
+            rs.next();
+            System.out.println("Department: " + rs.getString(1) + "\n" +
+                    "Count of Managers: " + rs.getInt(2));
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
-            if(connection != null){
-                connection.close();
-            }
             if(statement != null){
-                statement.close();
-            }
-            if(resultSet != null){
-                resultSet.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }

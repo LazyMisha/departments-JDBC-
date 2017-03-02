@@ -10,9 +10,7 @@ public class App {
         try {
             departmentsApplication.run();
         } catch (Exception e) {
-            System.out.println("the app is not correct works!");
-            System.out.println("probably you entered the wrong data");
-            System.out.println("run app again and type help!");
+            System.out.println(e.getMessage());
         }
     }
 }

@@ -22,27 +22,30 @@ public class DepartmentsDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public List<Department> getAll() throws SQLException {
+    public void getAll(){
         Statement statement = null;
-        List<Department> departments = new ArrayList<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(SELECT_ALL_QUERY);
             while (rs.next()) {
-                Department department = new Department(rs.getString(2));
-                department.setId(rs.getInt(1));
+                System.out.println("Id: " + rs.getInt(1) + "\n" +
+                "Department: " + rs.getString(2));
+                System.out.println("<---------------------->");
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
             if (statement != null) {
-                statement.close();
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
-        return departments;
     }
 
-    public void save(Department department) throws SQLException {
+    public void save(Department department){
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(INSERT_QUERY);
@@ -55,12 +58,16 @@ public class DepartmentsDao {
             System.out.println(e.getMessage());
         } finally {
             if (ps != null) {
-                ps.close();
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
 
-    public void removeByName(String departmentName) throws SQLException {
+    public void removeByName(String departmentName){
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(DELETE_BY_NAME_QUERY);
@@ -71,7 +78,11 @@ public class DepartmentsDao {
             System.out.println(e.getMessage());
         } finally {
             if (ps != null) {
-                ps.close();
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
