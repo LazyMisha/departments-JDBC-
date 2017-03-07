@@ -1,12 +1,12 @@
 package com.trunov.departments_jdbc;
 
-import com.sun.org.apache.xerces.internal.dom.DeepNodeListImpl;
 import com.trunov.departments_jdbc.dao.DepartmentsDao;
 import com.trunov.departments_jdbc.dao.DevelopersDao;
 import com.trunov.departments_jdbc.dao.EmployeeDao;
 import com.trunov.departments_jdbc.dao.ManagersDao;
 import com.trunov.departments_jdbc.entity.Department;
 import com.trunov.departments_jdbc.entity.Developer;
+import com.trunov.departments_jdbc.entity.Employee;
 import com.trunov.departments_jdbc.entity.Manager;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
 import com.trunov.departments_jdbc.util.PrintList;
@@ -14,8 +14,8 @@ import com.trunov.departments_jdbc.util.PrintList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
 
 /**
  * Created by misha on 21.02.17.
@@ -30,7 +30,7 @@ public class DepartmentsApplication {
     private ManagersDao managersDao = new ManagersDao();
     private DevelopersDao developersDao = new DevelopersDao();
 
-    public void run(){
+    public void run() throws SQLException {
         System.out.println("please type help for view list of all COMMANDS!");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -58,8 +58,11 @@ public class DepartmentsApplication {
                         break;
                     // list of departments
                     case "departments":
+                        for (Department department : departmentsDao.getAll()) {
+                            System.out.println("id: " + department.getId() +
+                                    ", Name: " + department.getName() + ".");
+                        }
                         list.clear();
-                        departmentsDao.getAll();
                         break;
                     // getAll COMMANDS
                    case "getAll":
@@ -70,11 +73,49 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else if (list.contains("-e")) {
-                            employeeDao.getAllEmployeesById(Integer.parseInt(list.get(2)));
+                            System.out.println("Developer with id " + list.get(2));
+                            for (Developer developer : developersDao.getById(Integer.parseInt(list.get(2)))) {
+                                System.out.println("id: " + developer.getId() +
+                                        ", Name: " + developer.getName() +
+                                        ", Last Name: " + developer.getLastname() +
+                                        ", Age: " + developer.getAge() +
+                                        ", Type: " + developer.getType() +
+                                        ", Language: " + developer.getLanguage() +
+                                        ", Department: " + developer.getDepartment());
+                            }
+                            System.out.println("Manager with id " + list.get(2));
+                            for (Manager manager : managersDao.getById(Integer.parseInt(list.get(2)))) {
+                                System.out.println("id: " + manager.getId() +
+                                        ", Name: " + manager.getName() +
+                                        ", Last Name: " + manager.getLastname() +
+                                        ", Age: " + manager.getAge() +
+                                        ", Type: " + manager.getType() +
+                                        ", Language: " + manager.getMethodology() +
+                                        ", Department: " + manager.getDepartment());
+                            }
                             list.clear();
                             break;
                         } else if (list.contains("-d")) {
-                            employeeDao.getEmployeesByDepartmentName(list.get(2));
+                            System.out.println("All developers from department " + list.get(2));
+                            for (Developer developer : developersDao.getByDepartmentName(list.get(2))) {
+                                System.out.println("id: " + developer.getId() +
+                                        ", Name: " + developer.getName() +
+                                        ", Last Name: " + developer.getLastname() +
+                                        ", Age: " + developer.getAge() +
+                                        ", Type: " + developer.getType() +
+                                        ", Language: " + developer.getLanguage() +
+                                        ", Department: " + developer.getDepartment());
+                            }
+                            System.out.println("All managers from department " + list.get(2));
+                            for (Manager manager : managersDao.getByDepartmentName(list.get(2))) {
+                                System.out.println("id: " + manager.getId() +
+                                        ", Name: " + manager.getName() +
+                                        ", Last Name: " + manager.getLastname() +
+                                        ", Age: " + manager.getAge() +
+                                        ", Type: " + manager.getType() +
+                                        ", Language: " + manager.getMethodology() +
+                                        ", Department: " + manager.getDepartment());
+                            }
                             list.clear();
                             break;
                         }
@@ -190,7 +231,12 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else {
-                            employeeDao.getAll();
+                            for (Employee employee : employeeDao.getAll()) {
+                                System.out.println("Department: " + employee.getDepartment() + "\n" +
+                                        "Name: " + employee.getName() + "\n" +
+                                        "Type: " + employee.getType() + "\n" +
+                                        "Age: " + employee.getAge() + "\n");
+                            }
                             list.clear();
                             break;
                         }
@@ -202,7 +248,20 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         } else {
-                            employeeDao.searchEmployee(Integer.parseInt(list.get(3)), list.get(5));
+                            System.out.println("Developer with id " + list.get(3)+ ", and department " + list.get(5) + ":" + "\n");
+                            for(Developer developer : developersDao.searchEmployee(Integer.parseInt(list.get(3)), list.get(5))){
+                                System.out.println("Id: " + developer.getId() + "\n" +
+                                        "Name: " + developer.getName() + "\n" +
+                                        "Type: " + developer.getType() + "\n" +
+                                        "Department: " + developer.getDepartment() + "\n");
+                            }
+                            System.out.println("Manager with id " + list.get(3)+ ", and department " + list.get(5) + ":" + "\n");
+                            for(Manager manager : managersDao.searchEmployee(Integer.parseInt(list.get(3)), list.get(5))){
+                                System.out.println("Id: " + manager.getId() + "\n" +
+                                        "Name: " + manager.getName() + "\n" +
+                                        "Type: " + manager.getType() + "\n" +
+                                        "Department: " + manager.getDepartment() + "\n");
+                            }
                             list.clear();
                             break;
                         }
@@ -214,13 +273,15 @@ public class DepartmentsApplication {
                             list.clear();
                             break;
                         }// top department of managers
-                        else if (list.contains("m")) {
-                            managersDao.count();
+                        else if (list.contains("d")) {
+                                System.out.println("Department: " + developersDao.count().get(0) + "\n" +
+                                "Number of developers: " + developersDao.count().get(1));
                             list.clear();
                             break;
                         }// top department of developers
-                        else if (list.contains("d")) {
-                            developersDao.count();
+                        else if (list.contains("m")) {
+                            System.out.println("Department: " + managersDao.count().get(0) + "\n" +
+                                    "Number of managers: " + managersDao.count().get(1));
                             list.clear();
                             break;
                         }

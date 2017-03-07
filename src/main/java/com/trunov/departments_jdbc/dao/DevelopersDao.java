@@ -3,6 +3,8 @@ package com.trunov.departments_jdbc.dao;
 import com.trunov.departments_jdbc.entity.Developer;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by misha on 28.02.17.
@@ -18,6 +20,7 @@ public class DevelopersDao {
     private static final String UPDATE_DEVELOPERS_QUERY = "update developers set name = ?, " +
             "lastname = ?, age = ?,type = ?, language = ?, department = ? where id = ?";
     private static final String SELECT_DEPARTMENT_COUNT_QUERY = "select department, count(*) from developers group by department";
+    private static final String SEARCH_ALL_EMPLOYEE_QUERY = "select * from developers where age = ? and department = ?";
 
     private Connection connection = null;
 
@@ -26,23 +29,28 @@ public class DevelopersDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public void getById(int id){
+    public List<Developer> getById(int id){
         PreparedStatement ps = null;
-        try {
+        List<Developer> developers = new ArrayList<>();
+        try{
             ps = connection.prepareStatement(SELECT_BY_ID_QUERY);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                System.out.println("Id: " + rs.getInt(1) + "\n" +
-                "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
-                "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
-                "Language: " + rs.getString(6)+ "\n" + "Department: " + rs.getString(7));
-                System.out.println("<---------------------->");
+            if(rs.next()){
+                Developer developer = new Developer();
+                developer.setId(rs.getInt(1));
+                developer.setName(rs.getString(2));
+                developer.setLastname(rs.getString(3));
+                developer.setAge(rs.getInt(4));
+                developer.setType(rs.getString(5));
+                developer.setLanguage(rs.getString(6));
+                developer.setDepartment(rs.getString(7));
+                developers.add(developer);
             }
-        } catch (SQLException e) {
+        }catch (SQLException e){
             System.out.println(e.getMessage());
-        } finally {
-            if (ps != null) {
+        }finally {
+            if(ps != null){
                 try {
                     ps.close();
                 } catch (SQLException e) {
@@ -50,20 +58,26 @@ public class DevelopersDao {
                 }
             }
         }
+        return developers;
     }
 
-    public void getByDepartmentName(String departmentName){
+    public List<Developer> getByDepartmentName(String departmentName){
         PreparedStatement ps = null;
+        List<Developer> developers = new ArrayList<>();
         try {
             ps = connection.prepareStatement(SELECT_BY_DEPARTMENT_NAME_QUERY);
             ps.setString(1, departmentName);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                System.out.println("Id: " + rs.getInt(1) + "\n" +
-                        "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
-                        "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
-                        "Language: " + rs.getString(6)+ "\n" + "Department: " + rs.getString(7));
-                System.out.println("<---------------------->");
+            if (rs.next()) {
+                Developer developer = new Developer();
+                developer.setId(rs.getInt(1));
+                developer.setName(rs.getString(2));
+                developer.setLastname(rs.getString(3));
+                developer.setAge(rs.getInt(4));
+                developer.setType(rs.getString(5));
+                developer.setLanguage(rs.getString(6));
+                developer.setDepartment(rs.getString(7));
+                developers.add(developer);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -76,6 +90,7 @@ public class DevelopersDao {
                 }
             }
         }
+        return developers;
     }
 
     public void save(Developer developer){
@@ -150,14 +165,15 @@ public class DevelopersDao {
         }
     }
 
-    public void count(){
+    public List<String> count(){
         Statement statement = null;
+        List<String> department = new ArrayList<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(SELECT_DEPARTMENT_COUNT_QUERY);
             rs.next();
-            System.out.println("Department: " + rs.getString(1) + "\n" +
-                    "Count of Developers: " + rs.getInt(2));
+            department.add(rs.getString(1));
+            department.add(rs.getString(2));
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -169,5 +185,36 @@ public class DevelopersDao {
                 }
             }
         }
+        return department;
+    }
+
+    public List<Developer> searchEmployee(int age, String departmentName){
+        PreparedStatement ps = null;
+        List<Developer> developers = new ArrayList<>();
+        try {
+            ps = connection.prepareStatement(SEARCH_ALL_EMPLOYEE_QUERY);
+            ps.setInt(1, age);
+            ps.setString(2, departmentName);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                Developer developer = new Developer();
+                developer.setId(resultSet.getInt(1));
+                developer.setName(resultSet.getString(2));
+                developer.setType(resultSet.getString(5));
+                developer.setDepartment(resultSet.getString(7));
+                developers.add(developer);
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }finally {
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return developers;
     }
 }

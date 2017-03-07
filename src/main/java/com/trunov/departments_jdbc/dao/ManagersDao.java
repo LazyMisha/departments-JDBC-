@@ -3,6 +3,8 @@ package com.trunov.departments_jdbc.dao;
 import com.trunov.departments_jdbc.entity.Manager;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by misha on 28.02.17.
@@ -18,6 +20,7 @@ public class ManagersDao {
     private static final String UPDATE_MANAGERS_QUERY = "update managers set name = ?, " +
             "lastname = ?, age = ?,type = ?, methodology = ?, department = ? where id = ?";
     private static final String SELECT_MANAGERS_COUNT_QUERY = "select department, count(*) from managers group by department";
+    private static final String SEARCH_ALL_EMPLOYEE_QUERY = "select * from managers where age = ? and department = ?";
 
     Connection connection = null;
 
@@ -26,18 +29,23 @@ public class ManagersDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public void  getById(int id){
+    public List<Manager> getById(int id){
         PreparedStatement ps = null;
+        List<Manager> managers = new ArrayList<>();
         try{
             ps = connection.prepareStatement(SELECT_BY_ID_QUERY);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                System.out.println("Id: " + rs.getInt(1) + "\n" +
-                        "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
-                        "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
-                        "Methodology: " + rs.getString(6) + "\n" + "Department: " + rs.getString(7));
-                System.out.println("<---------------------->");
+            if (rs.next()) {
+                Manager manager = new Manager();
+                manager.setId(rs.getInt(1));
+                manager.setName(rs.getString(2));
+                manager.setLastname(rs.getString(3));
+                manager.setAge(rs.getInt(4));
+                manager.setType(rs.getString(5));
+                manager.setMethodology(rs.getString(6));
+                manager.setDepartment(rs.getString(7));
+                managers.add(manager);
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
@@ -50,25 +58,31 @@ public class ManagersDao {
                 }
             }
         }
+        return managers;
     }
 
-    public void  getByDepartmentName(String departmentName){
+    public List<Manager> getByDepartmentName(String departmentName){
         PreparedStatement ps = null;
-        try{
+        List<Manager> managers = new ArrayList<>();
+        try {
             ps = connection.prepareStatement(SELECT_BY_DEPARTMENT_NAME_QUERY);
             ps.setString(1, departmentName);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                System.out.println("Id: " + rs.getInt(1) + "\n" +
-                        "Name: " + rs.getString(2) + "\n" + "Last Name: " + rs.getString(3) + "\n" +
-                        "Age: " + rs.getInt(4) + "\n" + "Type: " + rs.getString(5) + "\n" +
-                        "Methodology: " + rs.getString(6) + "\n" + "Department: " + rs.getString(7));
-                System.out.println("<---------------------->");
+            if (rs.next()) {
+                Manager manager = new Manager();
+                manager.setId(rs.getInt(1));
+                manager.setName(rs.getString(2));
+                manager.setLastname(rs.getString(3));
+                manager.setAge(rs.getInt(4));
+                manager.setType(rs.getString(5));
+                manager.setMethodology(rs.getString(6));
+                manager.setDepartment(rs.getString(7));
+                managers.add(manager);
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }finally {
-            if(ps != null){
+        } finally {
+            if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException e) {
@@ -76,6 +90,7 @@ public class ManagersDao {
                 }
             }
         }
+        return managers;
     }
 
     public void save(Manager manager){
@@ -103,7 +118,7 @@ public class ManagersDao {
         }
     }
 
-    public void  removeById(int managerId){
+    public void removeById(int managerId){
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(DELETE_FROM_MANAGERS_QUERY);
@@ -123,7 +138,7 @@ public class ManagersDao {
         }
     }
 
-    public void  updateById(int id, String name, String lastname, int age, char type,
+    public void updateById(int id, String name, String lastname, int age, char type,
                                          String methodology, String departments){
         PreparedStatement ps = null;
         try {
@@ -150,18 +165,19 @@ public class ManagersDao {
         }
     }
 
-    public void  count(){
+    public List<String> count(){
         Statement statement = null;
-        try{
+        List<String> department = new ArrayList<>();
+        try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(SELECT_MANAGERS_COUNT_QUERY);
             rs.next();
-            System.out.println("Department: " + rs.getString(1) + "\n" +
-                    "Count of Managers: " + rs.getInt(2));
-        }catch (SQLException e){
+            department.add(rs.getString(1));
+            department.add(rs.getString(2));
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }finally {
-            if(statement != null){
+        } finally {
+            if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException e) {
@@ -169,7 +185,36 @@ public class ManagersDao {
                 }
             }
         }
+        return department;
     }
 
-
+    public List<Manager> searchEmployee(int age, String departmentName){
+        PreparedStatement ps = null;
+        List<Manager> managers = new ArrayList<>();
+        try {
+            ps = connection.prepareStatement(SEARCH_ALL_EMPLOYEE_QUERY);
+            ps.setInt(1, age);
+            ps.setString(2, departmentName);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                Manager manager = new Manager();
+                manager.setId(resultSet.getInt(1));
+                manager.setName(resultSet.getString(2));
+                manager.setType(resultSet.getString(5));
+                manager.setDepartment(resultSet.getString(7));
+                managers.add(manager);
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }finally {
+            if(ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return managers;
+    }
 }

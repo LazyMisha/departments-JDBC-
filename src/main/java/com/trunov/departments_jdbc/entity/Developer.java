@@ -11,6 +11,10 @@ public class Developer extends Employee {
         this.language = language;
     }
 
+    public Developer(){
+
+    }
+
     public String getLanguage() {
         return language;
     }

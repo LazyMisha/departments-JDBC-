@@ -7,6 +7,10 @@ public class Entity {
     protected int id;
     protected String name;
 
+    public Entity(){
+
+    }
+
     Entity(String name) {
         this.name = name;
     }

@@ -11,6 +11,10 @@ public class Manager extends Employee {
         this.methodology = methodology;
     }
 
+    public Manager(){
+
+    }
+
     public String getMethodology() {
         return methodology;
     }

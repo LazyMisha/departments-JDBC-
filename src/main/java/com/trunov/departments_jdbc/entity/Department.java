@@ -10,4 +10,5 @@ public class Department extends Entity {
         super(name);
         this.id = UNIQUE_DEPARTMENT_ID++;
     }
+
 }

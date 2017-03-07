@@ -20,6 +20,10 @@ public class Employee extends Entity {
         this.id = UNIQUE_EMPLOYEE_ID++;
     }
 
+    public Employee(){
+
+    }
+
     public String getLastname(){
         return lastname;
     }

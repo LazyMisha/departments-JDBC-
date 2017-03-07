@@ -2,7 +2,6 @@ package com.trunov.departments_jdbc.dao;
 
 import com.trunov.departments_jdbc.entity.Department;
 import com.trunov.departments_jdbc.util.DatabaseUtil;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +21,17 @@ public class DepartmentsDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public void getAll(){
+    public List<Department> getAll(){
         Statement statement = null;
+        List<Department> departments = new ArrayList<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(SELECT_ALL_QUERY);
-            while (rs.next()) {
-                System.out.println("Id: " + rs.getInt(1) + "\n" +
-                "Department: " + rs.getString(2));
-                System.out.println("<---------------------->");
+            if (rs.next()) {
+                Department department = new Department(rs.getString(2));
+                department.setId(rs.getInt(1));
+                department.setName(rs.getString(2));
+                departments.add(department);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -43,9 +44,10 @@ public class DepartmentsDao {
                 }
             }
         }
+        return departments;
     }
 
-    public void save(Department department){
+    public void save(Department department) throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(INSERT_QUERY);
@@ -58,16 +60,12 @@ public class DepartmentsDao {
             System.out.println(e.getMessage());
         } finally {
             if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                }
+                ps.close();
             }
         }
     }
 
-    public void removeByName(String departmentName){
+    public void removeByName(String departmentName) throws SQLException {
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(DELETE_BY_NAME_QUERY);
@@ -78,11 +76,7 @@ public class DepartmentsDao {
             System.out.println(e.getMessage());
         } finally {
             if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                }
+                ps.close();
             }
         }
     }
