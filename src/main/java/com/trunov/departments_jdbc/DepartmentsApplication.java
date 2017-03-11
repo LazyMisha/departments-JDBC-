@@ -74,43 +74,41 @@ public class DepartmentsApplication {
                             break;
                         } else if (list.contains("-e")) {
                             System.out.println("Developer with id " + list.get(2));
-                            for (Developer developer : developersDao.getById(Integer.parseInt(list.get(2)))) {
+                            Developer developer = developersDao.getById(Integer.parseInt(list.get(2)));
                                 System.out.println("id: " + developer.getId() +
                                         ", Name: " + developer.getName() +
-                                        ", Last Name: " + developer.getLastname() +
+                                        ", Last Name: " + developer.getLastName() +
                                         ", Age: " + developer.getAge() +
                                         ", Type: " + developer.getType() +
                                         ", Language: " + developer.getLanguage() +
                                         ", Department: " + developer.getDepartment());
-                            }
                             System.out.println("Manager with id " + list.get(2));
-                            for (Manager manager : managersDao.getById(Integer.parseInt(list.get(2)))) {
+                            Manager manager = managersDao.getById(Integer.parseInt(list.get(2)));
                                 System.out.println("id: " + manager.getId() +
                                         ", Name: " + manager.getName() +
-                                        ", Last Name: " + manager.getLastname() +
+                                        ", Last Name: " + manager.getLastName() +
                                         ", Age: " + manager.getAge() +
                                         ", Type: " + manager.getType() +
                                         ", Language: " + manager.getMethodology() +
                                         ", Department: " + manager.getDepartment());
-                            }
                             list.clear();
                             break;
                         } else if (list.contains("-d")) {
                             System.out.println("All developers from department " + list.get(2));
-                            for (Developer developer : developersDao.getByDepartmentName(list.get(2))) {
+                            for (Developer developer : developersDao.getAllByDepartmentName(list.get(2))) {
                                 System.out.println("id: " + developer.getId() +
                                         ", Name: " + developer.getName() +
-                                        ", Last Name: " + developer.getLastname() +
+                                        ", Last Name: " + developer.getLastName() +
                                         ", Age: " + developer.getAge() +
                                         ", Type: " + developer.getType() +
                                         ", Language: " + developer.getLanguage() +
                                         ", Department: " + developer.getDepartment());
                             }
                             System.out.println("All managers from department " + list.get(2));
-                            for (Manager manager : managersDao.getByDepartmentName(list.get(2))) {
+                            for (Manager manager : managersDao.getAllByDepartmentName(list.get(2))) {
                                 System.out.println("id: " + manager.getId() +
                                         ", Name: " + manager.getName() +
-                                        ", Last Name: " + manager.getLastname() +
+                                        ", Last Name: " + manager.getLastName() +
                                         ", Age: " + manager.getAge() +
                                         ", Type: " + manager.getType() +
                                         ", Language: " + manager.getMethodology() +

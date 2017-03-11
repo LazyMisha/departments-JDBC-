@@ -29,23 +29,21 @@ public class ManagersDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public List<Manager> getById(int id){
+    public Manager getById(int id){
         PreparedStatement ps = null;
-        List<Manager> managers = new ArrayList<>();
+        Manager manager = new Manager();
         try{
             ps = connection.prepareStatement(SELECT_BY_ID_QUERY);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Manager manager = new Manager();
                 manager.setId(rs.getInt(1));
                 manager.setName(rs.getString(2));
-                manager.setLastname(rs.getString(3));
+                manager.setLastName(rs.getString(3));
                 manager.setAge(rs.getInt(4));
                 manager.setType(rs.getString(5));
                 manager.setMethodology(rs.getString(6));
                 manager.setDepartment(rs.getString(7));
-                managers.add(manager);
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
@@ -58,10 +56,10 @@ public class ManagersDao {
                 }
             }
         }
-        return managers;
+        return manager;
     }
 
-    public List<Manager> getByDepartmentName(String departmentName){
+    public List<Manager> getAllByDepartmentName(String departmentName){
         PreparedStatement ps = null;
         List<Manager> managers = new ArrayList<>();
         try {
@@ -72,7 +70,7 @@ public class ManagersDao {
                 Manager manager = new Manager();
                 manager.setId(rs.getInt(1));
                 manager.setName(rs.getString(2));
-                manager.setLastname(rs.getString(3));
+                manager.setLastName(rs.getString(3));
                 manager.setAge(rs.getInt(4));
                 manager.setType(rs.getString(5));
                 manager.setMethodology(rs.getString(6));
@@ -98,7 +96,7 @@ public class ManagersDao {
         try{
             ps = connection.prepareStatement(INSERT_INTO_MANAGERS_QUERY);
             ps.setString(1, manager.getName());
-            ps.setString(2, manager.getLastname());
+            ps.setString(2, manager.getLastName());
             ps.setInt(3, manager.getAge());
             ps.setString(4, manager.getType());
             ps.setString(5, manager.getMethodology());

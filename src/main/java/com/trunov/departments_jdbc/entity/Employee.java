@@ -7,13 +7,13 @@ public class Employee extends Entity {
     protected static int UNIQUE_EMPLOYEE_ID = 0;
 
     private int age;
-    private String lastname;
+    private String lastName;
     private String type;
     private String department;
 
     Employee(String name, String lastName, int age, String type, String department) {
         super(name);
-        this.lastname = lastName;
+        this.lastName = lastName;
         this.age = age;
         this.type = type;
         this.department = department;
@@ -24,11 +24,11 @@ public class Employee extends Entity {
 
     }
 
-    public String getLastname(){
-        return lastname;
+    public String getLastName(){
+        return lastName;
     }
-    public void setLastname(String lastname){
-        this.lastname = lastname;
+    public void setLastName(String lastName){
+        this.lastName = lastName;
     }
 
     public String getType(){

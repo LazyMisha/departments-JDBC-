@@ -29,23 +29,21 @@ public class DevelopersDao {
         connection = DatabaseUtil.getConnection();
     }
 
-    public List<Developer> getById(int id){
+    public Developer getById(int id){
         PreparedStatement ps = null;
-        List<Developer> developers = new ArrayList<>();
+        Developer developer = new Developer();
         try{
             ps = connection.prepareStatement(SELECT_BY_ID_QUERY);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
-                Developer developer = new Developer();
                 developer.setId(rs.getInt(1));
                 developer.setName(rs.getString(2));
-                developer.setLastname(rs.getString(3));
+                developer.setLastName(rs.getString(3));
                 developer.setAge(rs.getInt(4));
                 developer.setType(rs.getString(5));
                 developer.setLanguage(rs.getString(6));
                 developer.setDepartment(rs.getString(7));
-                developers.add(developer);
             }
         }catch (SQLException e){
             System.out.println(e.getMessage());
@@ -58,10 +56,10 @@ public class DevelopersDao {
                 }
             }
         }
-        return developers;
+        return developer;
     }
 
-    public List<Developer> getByDepartmentName(String departmentName){
+    public List<Developer> getAllByDepartmentName(String departmentName){
         PreparedStatement ps = null;
         List<Developer> developers = new ArrayList<>();
         try {
@@ -72,7 +70,7 @@ public class DevelopersDao {
                 Developer developer = new Developer();
                 developer.setId(rs.getInt(1));
                 developer.setName(rs.getString(2));
-                developer.setLastname(rs.getString(3));
+                developer.setLastName(rs.getString(3));
                 developer.setAge(rs.getInt(4));
                 developer.setType(rs.getString(5));
                 developer.setLanguage(rs.getString(6));
@@ -98,7 +96,7 @@ public class DevelopersDao {
         try {
             ps = connection.prepareStatement(INSERT_INTO_DEVELOPERS_QUERY);
             ps.setString(1, developer.getName());
-            ps.setString(2, developer.getLastname());
+            ps.setString(2, developer.getLastName());
             ps.setInt(3, developer.getAge());
             ps.setString(4, developer.getType());
             ps.setString(5, developer.getLanguage());

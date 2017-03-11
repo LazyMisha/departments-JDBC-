@@ -84,50 +84,24 @@ public abstract class DatabaseUtil {
     }
 
     public static void createTableDepartments(){
-        PreparedStatement ps = null;
-        try{
-            connection = getConnection();
-            ps = connection.prepareStatement(CREATE_TABLE_DEPARTMENTS_QUERY);
-            ps.executeUpdate();
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        }finally {
-            if(ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
+        createTable(CREATE_TABLE_DEPARTMENTS_QUERY);
     }
 
     public static void createTableDevelopers(){
-        PreparedStatement ps = null;
-        try {
-            connection = getConnection();
-            ps = connection.prepareStatement(CREATE_TABLE_DEVELOPERS_QUERY);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }finally {
-            if(ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
+        createTable(CREATE_TABLE_DEVELOPERS_QUERY);
     }
 
     public static void createTableManager(){
+        createTable(CREATE_TABLE_MANAGERS_QUERY);
+    }
+
+    private static void createTable(String query) {
         PreparedStatement ps = null;
         try{
             connection = getConnection();
-            ps = connection.prepareStatement(CREATE_TABLE_MANAGERS_QUERY);
+            ps = connection.prepareStatement(query);
             ps.executeUpdate();
-        }catch(SQLException e){
+        }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
             if(ps != null){
